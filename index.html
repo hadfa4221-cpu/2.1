@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SillyTavern 角色生成器</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- 顶部导航 -->
+    <header>
+      <nav id="navbar">
+        <div class="logo">SillyTavern User Generator</div>
+        <button id="toggle-menu" aria-label="展开导航">≡</button>
+        <ul id="nav-links">
+          <li><a href="#settings" data-target="settings">设置</a></li>
+          <li><a href="#self-generator" data-target="self-generator">自述生成</a></li>
+          <li><a href="#chat-generator" data-target="chat-generator">边聊生成</a></li>
+          <li><a href="#tag-generator" data-target="tag-generator">标签生成</a></li>
+          <li><a href="#template-generator" data-target="template-generator">模板填写</a></li>
+          <li><a href="#upload-generator" data-target="upload-generator">上传/二改</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- 页面容器 -->
+    <main>
+      <!-- 设置页：用于填写接口地址、API 密钥及获取模型列表 -->
+      <section id="settings" class="page active">
+        <h2>接口设置</h2>
+        <div class="form-group">
+          <label for="base-url">基础地址（例如 https://api.openai.com/v1）</label>
+          <input type="url" id="base-url" placeholder="请输入兼容 OpenAI 的基础接口地址" />
+        </div>
+        <div class="form-group">
+          <label for="api-key">API 密钥</label>
+          <input type="text" id="api-key" placeholder="请输入 API 密钥（可选）" />
+        </div>
+        <div class="form-group">
+          <button id="fetch-models">获取模型列表</button>
+        </div>
+        <div class="form-group">
+          <label for="model-select">选择模型</label>
+          <select id="model-select"></select>
+        </div>
+        <p class="hint">⚠️ 注意：为了安全，请不要在公开环境中使用自己的私密 API 密钥。</p>
+      </section>
+
+      <!-- 自述生成 -->
+      <section id="self-generator" class="page">
+        <h2>自述生成</h2>
+        <p>如果您已经有一个明确的设定，可以在此描述世界观、人物性格、场景与第一句台词，由 AI 生成适合的角色卡。</p>
+        <div class="form-group">
+          <label for="self-world">世界观</label>
+          <textarea id="self-world" placeholder="描述角色所处的世界，如魔法大陆、科幻未来等"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="self-personality">性格特征</label>
+          <textarea id="self-personality" placeholder="描述角色的性格，例如：勇敢而自负、温柔但阴沉"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="self-scene">故事场景</label>
+          <textarea id="self-scene" placeholder="描述一个重要的场景或背景故事"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="self-first-message">第一条信息</label>
+          <textarea id="self-first-message" placeholder="用户在与角色初次互动时看到的第一句话"></textarea>
+        </div>
+        <button id="generate-self">生成角色卡</button>
+        <pre id="self-result" class="result"></pre>
+      </section>
+
+      <!-- 边聊边生成 -->
+      <section id="chat-generator" class="page">
+        <h2>边聊边生成</h2>
+        <p>与 AI 聊天确认模糊设定，最终生成完整角色卡。</p>
+        <div id="chat-area">
+          <div id="chat-messages"></div>
+          <div id="chat-input-bar">
+            <input id="chat-input" type="text" placeholder="输入内容以与 AI 讨论..." />
+            <button id="chat-send">发送</button>
+            <button id="chat-finish">完成生成</button>
+          </div>
+        </div>
+        <pre id="chat-result" class="result"></pre>
+      </section>
+
+      <!-- 标签生成 -->
+      <section id="tag-generator" class="page">
+        <h2>标签生成</h2>
+        <p>从下方标签库中选择你想要的元素，AI 将基于这些标签生成角色设定。标签分类仅为示例，您可以自行扩展。</p>
+        <div class="tags-container">
+          <div class="tag-group">
+            <h3>发色</h3>
+            <label><input type="checkbox" value="金色头发" class="tag-input" />金色</label>
+            <label><input type="checkbox" value="黑色头发" class="tag-input" />黑色</label>
+            <label><input type="checkbox" value="红色头发" class="tag-input" />红色</label>
+            <label><input type="checkbox" value="蓝色头发" class="tag-input" />蓝色</label>
+          </div>
+          <div class="tag-group">
+            <h3>瞳色</h3>
+            <label><input type="checkbox" value="绿色眼睛" class="tag-input" />绿色</label>
+            <label><input type="checkbox" value="紫色眼睛" class="tag-input" />紫色</label>
+            <label><input type="checkbox" value="琥珀色眼睛" class="tag-input" />琥珀</label>
+            <label><input type="checkbox" value="灰色眼睛" class="tag-input" />灰色</label>
+          </div>
+          <div class="tag-group">
+            <h3>职业</h3>
+            <label><input type="checkbox" value="赏金猎人" class="tag-input" />赏金猎人</label>
+            <label><input type="checkbox" value="炼金术士" class="tag-input" />炼金术士</label>
+            <label><input type="checkbox" value="冒险家" class="tag-input" />冒险家</label>
+            <label><input type="checkbox" value="王子/公主" class="tag-input" />王子/公主</label>
+          </div>
+          <div class="tag-group">
+            <h3>性格</h3>
+            <label><input type="checkbox" value="温柔" class="tag-input" />温柔</label>
+            <label><input type="checkbox" value="暴躁" class="tag-input" />暴躁</label>
+            <label><input type="checkbox" value="聪明" class="tag-input" />聪明</label>
+            <label><input type="checkbox" value="傲娇" class="tag-input" />傲娇</label>
+          </div>
+          <div class="tag-group">
+            <h3>关系</h3>
+            <label><input type="checkbox" value="青梅竹马" class="tag-input" />青梅竹马</label>
+            <label><input type="checkbox" value="师徒" class="tag-input" />师徒</label>
+            <label><input type="checkbox" value="宿敌" class="tag-input" />宿敌</label>
+            <label><input type="checkbox" value="爱慕对象" class="tag-input" />爱慕对象</label>
+          </div>
+        </div>
+        <button id="generate-from-tags">生成角色卡</button>
+        <pre id="tags-result" class="result"></pre>
+      </section>
+
+      <!-- 模板填写 -->
+      <section id="template-generator" class="page">
+        <h2>模板填写</h2>
+        <p>如果你想亲手设计角色，可以填写以下模板。可以选择让 AI 对文本进行润色或扩写。</p>
+        <div class="form-group">
+          <label for="template-name">角色名称</label>
+          <input id="template-name" type="text" placeholder="输入角色姓名" />
+        </div>
+        <div class="form-group">
+          <label for="template-description">角色描述</label>
+          <textarea id="template-description" placeholder="描述角色外观、能力、背景等"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="template-extra">第一句话</label>
+          <textarea id="template-extra" placeholder="AI 在对话开始时发送给用户的第一句话"></textarea>
+        </div>
+        <button id="template-submit">生成/润色</button>
+        <pre id="template-result" class="result"></pre>
+      </section>
+
+      <!-- 上传/二改 -->
+      <section id="upload-generator" class="page">
+        <h2>上传与二改</h2>
+        <p>上传已有的 .json 角色卡并说明你的修改需求，由 AI 生成一个调整后的版本。</p>
+        <div class="form-group">
+          <label for="upload-file">选择 .json 文件</label>
+          <input id="upload-file" type="file" accept="application/json" />
+        </div>
+        <div class="form-group">
+          <label for="upload-modify">修改说明</label>
+          <textarea id="upload-modify" placeholder="描述希望修改或添加的部分，如增加设定、调整语气等"></textarea>
+        </div>
+        <button id="upload-submit">上传并二改</button>
+        <pre id="upload-result" class="result"></pre>
+      </section>
+    </main>
+
+    <!-- 全局 AI 辅助按钮与模态框 -->
+    <button id="assistant-button" title="全局 AI 助手">💬</button>
+    <div id="assistant-modal" class="modal">
+      <div class="modal-content">
+        <span id="assistant-close" class="close">×</span>
+        <h3>全局 AI 助手</h3>
+        <div id="assistant-messages" class="chat-scroll"></div>
+        <div id="assistant-input-bar">
+          <input id="assistant-input" type="text" placeholder="请输入你的问题..." />
+          <button id="assistant-send">发送</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
